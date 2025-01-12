@@ -1,5 +1,6 @@
 ;;;; Test of displaced array reference
 ;;;
+;;;
 
 (org.tfeb.tools.require-module:needs
  ((:org.tfeb.hax.iterate :org.tfeb.hax.utilities)
@@ -13,25 +14,30 @@
 
 (in-package :ts-dar)
 
-(defun call/base-array (f a)
+;;; This could be made to work for multidimensional arrays but this is
+;;; really specialised to vectors (especially the local macro).  For
+;;; general arrays you'd have to rely on row-major-aref being fast.
+;;;
+
+(defun call/base-vector (f a)
   (iterate next ((b a) (o 0))
     (multiple-value-bind (bb oo) (array-displacement b)
       (if bb
           (next bb (+ o oo))
         (funcall f b o)))))
 
-(defmacro with-base-array ((b o &optional accessor-macro-name) a
+(defmacro with-base-vector ((b o &optional accessor-macro-name) a
                            &body decls/forms)
   (if accessor-macro-name
       (multiple-value-bind (decls forms) (parse-simple-body decls/forms)
-        `(call/base-array
+        `(call/base-vector
           (lambda (,b ,o)
             ,@decls
             (macrolet ((,accessor-macro-name (i)
                          `(aref ,',b (+ ,i ,',o))))
               ,@forms))
           ,a))
-      `(call/base-array
+      `(call/base-vector
         (lambda (,b ,o)
           ,@decls/forms)
         ,a)))
@@ -89,7 +95,7 @@
            (type fixnum n)
            (optimize speed (safety 0)
                      #+LispWorks (float 0)))
-  (with-base-array (b o ref) a
+  (with-base-vector (b o ref) a
     (declare (type (simple-array double-float (*)) b)
              (type fixnum o)
              (optimize speed (safety 0)
@@ -110,7 +116,7 @@
            (type fixnum n)
            (optimize speed (safety 0)
                      #+LispWorks (float 0)))
-  (with-base-array (b o) a
+  (with-base-vector (b o) a
     (declare (type (simple-array double-float (*)) b)
              (type fixnum o))
     (tsoa b n o (length a))))
