@@ -25,7 +25,7 @@ be fine on at least LW and SBCL.  There are various versions of the
 dot product function and some code to roighty sanity-test & benchmark
 them.
 
-Using an M1 Macbook Air, here are per-step times, in seconds, for the
+Using an M1 MacBook Air, here are per-step times, in seconds, for the
 various versions (benchem tells you this), from an example run.  The
 times are pretty consistent between runs, probably to two significant
 figures.
@@ -63,9 +63,10 @@ dot-offset                    9.595E-10
 dot-offset-smarter            9.38E-10
 
 * Conclusions
-CL can get about 9.4/ns per step for an inner product.  So can C:
-there's no significant performance difference.  LW and SBCL are
-comparable although LW misses some cases that SBCL spots.
+CL can get about 0.94 ns/step for a double-float inner product on an
+M1 MacBook Air.  So can C: there's no significant performance
+difference.  LW and SBCL are comparable although LW misses some cases
+that SBCL spots.
 
 * Notes
 In order to amortise the cost of calling into the dot product function
