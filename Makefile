@@ -11,4 +11,4 @@ build: dp.dylib
 	$(CC) -shared $(CFLAGS) $(OPTIMIZE) $< -o $@
 
 clean:
-	rm -f *.dylib
+	rm -f *.dylib *~
