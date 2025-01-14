@@ -8,7 +8,7 @@ This is some tests of displaced array references, or really displaced
 vector references.  In order to compute, say, the inner product of two
 subsequences of a vector, an approach is to use displaced arrays.
 Accessing elements of displaced arrays is generally slower than for
-somple-arrays, but if the array underlying a displaced array (at
+simple-arrays, but if the array underlying a displaced array (at
 whatever level) is a simple-array, you can extract it, compute the
 (possibly combined) offset, and use this array.
 
@@ -72,18 +72,18 @@ that SBCL spots.
 In order to amortise the cost of calling into the dot product function
 it computes a bunch of iterations: you can control this but it's
 generally 100 here.  The actual benchmark functions know this and
-divide out suitably
+divide out suitably.
 
 You probably won't be able to run any of this without having a bunch
 of my tools installed.
 
-Both things need 'needs' (from require-module) to load stuff/
+Both things need 'needs' (from require-module) to load stuff.
 
 ts-dar needs 'iterate' (from org.tfeb.hax) which is syntactic sugar
-for labels (it's Scheme's named let.
+for labels (it's Scheme's named let).
 
 Both need the 'timing' macro which is not available anywhere yet.
-It's pretty simple though: (timing (n) form ...) run n iterations of
+It's pretty simple though: (timing (n) form ...) runs n iterations of
 its body and returns the average time per iteration, as a float.
 (timing (n m) ...) prints a note every m iterations.
 
