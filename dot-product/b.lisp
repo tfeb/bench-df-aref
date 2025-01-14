@@ -115,9 +115,10 @@
      ',dotters))
 
 (defun tsit ()
-  (testing-dotters (dotter (dot-offset dot-offset-avoid-addition
-                                       dot-offset-do
-                                       dot-offset-do-u2))
+  (testing-dotters (dotter (dot-offset-dotimes
+                            dot-offset-avoid-addition
+                            dot-offset-do
+                            dot-offset-do-u2))
     (and
      (let ((a (make-array 100 :element-type 'double-float :initial-element 0.0d0)))
        (setf (aref a 0) 2.0d0)
@@ -152,13 +153,16 @@
                     (otherwise
                      (error "~S isn't one of ~{~S~^, ~}" what ',names)))))
       (choose
-       dot-offset
+       dot-offset-dotimes
        dot-offset-avoid-addition
        dot-offset-do
        dot-offset-do-u2))))
 
 (defun benchem ()
-  (dolist (what '(dot-offset dot-offset-avoid-addition dot-offset-do
+  (tsit)
+  (dolist (what '(dot-offset-dotimes
+                  dot-offset-avoid-addition
+                  dot-offset-do
                   dot-offset-do-u2))
     (format t "~&~30S" what)
     (finish-output)
