@@ -1,0 +1,94 @@
+This is some CL code I wrote to test double-float array performance in
+CL.  It's a combination of two older things.  None of this is anything
+like production-quality code.  None of it can be run without some
+other things of mine (see below).  Some is LispWorks-specific.
+
+* dar
+This is some tests of displaced array references, or really displaced
+vector references.  In order to compute, say, the inner product of two
+subsequences of a vector, an approach is to use displaced arrays.
+Accessing elements of displaced arrays is generally slower than for
+somple-arrays, but if the array underlying a displaced array (at
+whatever level) is a simple-array, you can extract it, compute the
+(possibly combined) offset, and use this array.
+
+dar/ts-dar.lisp has the obvious simple-array extractor macro, and some
+functions which test it.  I can't make this fast without some hoops
+(see tsda/tsoa) in LispWorks, but in SBCL it's fine.
+
+* dot-product
+The other approach to computing inner products of subsequences is just
+to pass an offset and length to the function.  Code here tests that.
+
+dot/product/b.lisp is some CL code to test performance.  This should
+be fine on at least LW and SBCL.  There are various versions of the
+dot product function and some code to roighty sanity-test & benchmark
+them.
+
+Using an M1 Macbook Air, here are per-step times, in seconds, for the
+various versions (benchem tells you this), from an example run.  The
+times are pretty consistent between runs, probably to two significant
+figures.
+
+For LispWorks 8.0.1
+
+dot-offset-dotimes            1.1075E-9
+dot-offset-avoid-addition     3.4664998E-9
+dot-offset-do                 9.384999E-10
+dot-offset-do-u2              9.4E-10
+
+LW is, I think not working out that the array in
+dot-offset-avoid-addition is a simple-array.
+
+For SBCL 2.5.0
+
+dot-offset-dotimes            9.550276e-10
+dot-offset-avoid-addition     9.44218e-10
+dot-offset-do                 9.40803e-10
+dot-offset-do-u2              9.414726e-10
+
+
+dot-product/c.lisp contains some LW-specific code which calls out to
+functions defined in dp.c.  Those functions are pretty simple-minded,
+but not that much more simple-minded than the Lisp equivalents.  My
+guess is that large performance increases can't be had without relying
+on something like vectorising support in the machine
+
+You need to compile the shared library (make will do this for macOS)
+and then it should work to just compile and load "c.lisp".
+
+Using the same machine as above, and LW 8.0.1
+
+dot-offset                    9.595E-10
+dot-offset-smarter            9.38E-10
+
+* Conclusions
+CL can get about 9.4/ns per step for an inner product.  So can C:
+there's no significant performance difference.  LW and SBCL are
+comparable although LW misses some cases that SBCL spots.
+
+* Notes
+In order to amortise the cost of calling into the dot product function
+it computes a bunch of iterations: you can control this but it's
+generally 100 here.  The actual benchmark functions know this and
+divide out suitably
+
+You probably won't be able to run any of this without having a bunch
+of my tools installed.
+
+Both things need 'needs' (from require-module) to load stuff/
+
+ts-dar needs 'iterate' (from org.tfeb.hax) which is syntactic sugar
+for labels (it's Scheme's named let.
+
+Both need the 'timing' macro which is not available anywhere yet.
+It's pretty simple though: (timing (n) form ...) run n iterations of
+its body and returns the average time per iteration, as a float.
+(timing (n m) ...) prints a note every m iterations.
+
+You can't load b.lisp and c.lisp into the same image (well, you can,
+but you can't expect either to work).
+
+* Copyright, license
+All this is copyright 2024, by me, Tim Bradshaw.  If you want to use
+any of it consider it to be under the MIT license.
