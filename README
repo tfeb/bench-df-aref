@@ -3,6 +3,8 @@ CL.  It's a combination of two older things.  None of this is anything
 like production-quality code.  None of it can be run without some
 other things of mine (see below).  Some is LispWorks-specific.
 
+Do not contact me about this code: your problems are your own.
+
 * dar
 This is some tests of displaced array references, or really displaced
 vector references.  In order to compute, say, the inner product of two
